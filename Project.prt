@@ -1,12 +1,13 @@
 ; FASM Editor
 
-include "main.asm"
+include "task_kr-8-1.asm"
 
 if 2 * 2 = 5
 [options]
-  countAsm=1
+  countAsm=2
   countInc=0
 [asm]
-  asm1="main.asm"
+  asm1="task_kr-8-1.asm"
+  asm2="task_kr-8-2.asm"
 [inc]
 end if
