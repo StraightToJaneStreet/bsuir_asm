@@ -19,20 +19,23 @@ section '.code' code readable executable
   invoke printf, msg_in_b
   invoke scanf, input_fmt, b
   
-  mov ax, cs
+  mov ax, cs       ; ��������� �� ������� �������
   
-  push eax
-  push dword .retp
+  ; ������� ��������� ��� �������� ��������
+  push eax         ; ��������� �� ���� cs
+  push dword .retp ; ��������� offset ����� �������� ����� ������
   
-  push eax
-  push solution
-
+  ; ��������� ������� call ������� ���������
+  push eax         ; push cs 
+  push solution     ; ��������� ����� "����������" �������
+  
+  ; �������� ��������� ����� �������
   mov ah, byte ptr a
   mov al, byte ptr b
     
-  retf
+  retf ; ���������� ��� ��� call cs:offset
   
-  .retp:
+  .retp: ; ����� �������� ��� retf
 
   mov [result], eax
   
@@ -51,29 +54,35 @@ section '.data' data readable writeable
 
 section '.funcs' code readable executable
   proc  solution  far
+    ; ������ �������� ���������� �� �������� �� ����
     local a:BYTE, b:BYTE, b16:WORD
-    mov [a], ah
+    mov [a], ah 
     mov [b], al
     
+    ; ��������� A^2
     mov ah, 0
     mov [b16], ax
     mov al, [a]
     mul [a] 
 
-    mov ecx, eax
+    mov ecx, eax ; ��������� ��������� ����������
     
+    ; ��������� B^3
     mov al, [b]
     mul [b]
-    
     mov dx, [b16] 
     mul dx
-    
     shl edx, 16
     or eax, edx
     
+    ; ��������� A^2 | B^3
     or eax, ecx
+    
+    ; ������� �� ����� ��� WORD (BYTE + BYTE + WORD)
     pop ebx
     pop ebx
+    
+    ; ������������ �� ������� ������� � ����� ����� ��������
     retf
   endp
 
