@@ -13,7 +13,7 @@ section '.idata' data import readable
 section '.code' code readable executable 
   entry $
   
-  invoke print, msg_intro
+  invoke printf, msg_intro
 
   invoke printf, msg_in_a
   invoke scanf, input_fmt, a
@@ -32,8 +32,10 @@ section '.code' code readable executable
   push solution     ; Добавляем адрес "вызываемой" функции
   
   ; Передаем аргументы через глобальные переменные
-  mov [global_a], byte a
-  mov [global_b], byte b
+  mov ah, byte [a]
+  mov al, byte [b]
+  mov [global_a], ah
+  mov [global_b], al
   
   retf ; Прдеставим что тут call cs:offset
   
@@ -47,22 +49,24 @@ section '.code' code readable executable
       
 section '.data' data readable writeable
   input_fmt db '%d', 0
-  msg_into db 'Far call + global variables', 0
+  msg_intro db 'Far call + global variables', 0dh, 0ah, 0
   msg_in_a db 'A: ', 0
   msg_in_b db 'B: ', 0
   output_fmt db 'Result: %d', 0
-  a dd ?
+  a db ?
   b dd ?
-  global_a db ?
-  global_b db ?
+  global_a db 0
+  global_b db 0
   result dd 0
 
 section '.funcs' code readable executable
   proc  solution  far
     ; Кладём значения аргументов из регистов на стек
     local a:BYTE, b:BYTE, b16:WORD
-    mov [a], [global_a] 
-    mov [b], [global_b]
+    mov ah, byte [global_a]
+    mov al, byte [global_b]
+    mov [a], ah 
+    mov [b], al
     
     ; Вычисляем A^2
     mov ah, 0
@@ -82,8 +86,6 @@ section '.funcs' code readable executable
     
     ; Вычисляем A^2 | B^3
     or eax, ecx
-    
-    mov eax, 0
     
     ; Снимаем со стека два WORD (BYTE + BYTE + WORD)
     pop ebx
