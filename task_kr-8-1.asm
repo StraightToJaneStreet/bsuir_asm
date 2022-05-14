@@ -9,42 +9,42 @@ section '.idata' data import readable
     printf, 'printf', \
     getch, '_getch', \
     scanf, 'scanf'
-                       
-section '.code' code readable executable 
+
+section '.code' code readable executable
   entry $
+
+  invoke printf, msg_intro
 
   invoke printf, msg_in_a
   invoke scanf, input_fmt, a
-  
+
   invoke printf, msg_in_b
   invoke scanf, input_fmt, b
-  
-  mov ax, cs       ; ��������� �� ������� �������
-  
-  ; ������� ��������� ��� �������� ��������
-  push eax         ; ��������� �� ���� cs
-  push dword .retp ; ��������� offset ����� �������� ����� ������
-  
-  ; ��������� ������� call ������� ���������
-  push eax         ; push cs 
-  push solution     ; ��������� ����� "����������" �������
-  
-  ; �������� ��������� ����� �������
+
+  mov ax, cs
+
+  push eax
+  push dword .retp
+
+  push eax
+  push solution
+
   mov ah, byte ptr a
   mov al, byte ptr b
-    
-  retf ; ���������� ��� ��� call cs:offset
-  
-  .retp: ; ����� �������� ��� retf
+
+  retf
+
+  .retp:
 
   mov [result], eax
-  
+
   invoke printf, output_fmt, [result]
   invoke getch
   invoke exit, 0
-      
+
 section '.data' data readable writeable
   input_fmt db '%d', 0
+  msg_intro db 'Far call + register variables', 0dh, 0ah, 0
   msg_in_a db 'A: ', 0
   msg_in_b db 'B: ', 0
   output_fmt db 'Result: %d', 0
@@ -54,35 +54,30 @@ section '.data' data readable writeable
 
 section '.funcs' code readable executable
   proc  solution  far
-    ; ������ �������� ���������� �� �������� �� ����
     local a:BYTE, b:BYTE, b16:WORD
-    mov [a], ah 
+
+    mov [a], ah
     mov [b], al
-    
-    ; ��������� A^2
+
     mov ah, 0
     mov [b16], ax
     mov al, [a]
-    mul [a] 
+    mul [a]
 
-    mov ecx, eax ; ��������� ��������� ����������
-    
-    ; ��������� B^3
+    mov ecx, eax
+
     mov al, [b]
     mul [b]
-    mov dx, [b16] 
+    mov dx, [b16]
     mul dx
     shl edx, 16
     or eax, edx
-    
-    ; ��������� A^2 | B^3
+
     or eax, ecx
-    
-    ; ������� �� ����� ��� WORD (BYTE + BYTE + WORD)
+
     pop ebx
     pop ebx
-    
-    ; ������������ �� ������� ������� � ����� ����� ��������
+
     retf
   endp
 
